@@ -151,8 +151,7 @@ public class BlockSoundMuffler extends BlockContainer {
     }
 
     @Override
-//    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
-    public void func_190948_a(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
         if(stack.hasTagCompound()) {
             NBTTagCompound compound = stack.getTagCompound();
 

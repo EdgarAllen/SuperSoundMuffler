@@ -49,7 +49,7 @@ public class MessageToggleWhiteListMode implements IMessage {
         }
 
         private void handle(MessageToggleWhiteListMode message, MessageContext ctx) {
-            World world = ctx.getServerHandler().playerEntity.worldObj;
+            World world = ctx.getServerHandler().playerEntity.world;
             TileEntity te = world.getTileEntity(message.pos);
 
             if (te != null && te instanceof TileEntitySoundMuffler) {

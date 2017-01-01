@@ -81,16 +81,16 @@ public class TileEntitySoundMuffler extends TileEntity {
         muffledSounds.add(sound);
 
         markDirty();
-        IBlockState state = worldObj.getBlockState(pos);
-        worldObj.notifyBlockUpdate(pos, state, state, 4);
+        IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 4);
     }
 
     public void unmuffleSound(ResourceLocation sound) {
         muffledSounds.remove(sound);
 
         markDirty();
-        IBlockState state = worldObj.getBlockState(pos);
-        worldObj.notifyBlockUpdate(pos, state, state, 4);
+        IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 4);
     }
 
     public List<ResourceLocation> getMuffledSounds() {
@@ -101,8 +101,8 @@ public class TileEntitySoundMuffler extends TileEntity {
         whiteListMode = !whiteListMode;
 
         markDirty();
-        IBlockState state = worldObj.getBlockState(pos);
-        worldObj.notifyBlockUpdate(pos, state, state, 4);
+        IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 4);
     }
 
     public boolean isWhiteList() { return whiteListMode; }

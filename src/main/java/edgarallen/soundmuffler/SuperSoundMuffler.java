@@ -70,15 +70,15 @@ public class SuperSoundMuffler {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onPlaySound(PlaySoundEvent event) {
-        WorldClient theWorld = Minecraft.getMinecraft().theWorld;
+        WorldClient theWorld = Minecraft.getMinecraft().world;
         if(theWorld != null) {
             ISound sound = event.getSound();
-            int minX = MathHelper.floor_double(sound.getXPosF() - 8f);
-            int maxX = MathHelper.ceiling_double_int(sound.getXPosF() + 8f);
-            int minY = MathHelper.floor_double(sound.getYPosF() - 8f);
-            int maxY = MathHelper.ceiling_double_int(sound.getYPosF() + 8f);
-            int minZ = MathHelper.floor_double(sound.getZPosF() - 8f);
-            int maxZ = MathHelper.ceiling_double_int(sound.getZPosF() + 8f);
+            int minX = MathHelper.floor(sound.getXPosF() - 8f);
+            int maxX = MathHelper.ceil(sound.getXPosF() + 8f);
+            int minY = MathHelper.floor(sound.getYPosF() - 8f);
+            int maxY = MathHelper.ceil(sound.getYPosF() + 8f);
+            int minZ = MathHelper.floor(sound.getZPosF() - 8f);
+            int maxZ = MathHelper.ceil(sound.getZPosF() + 8f);
 
             for(int x = minX; x < maxX; ++x) {
                 for(int z = minZ; z < maxZ; ++z) {
