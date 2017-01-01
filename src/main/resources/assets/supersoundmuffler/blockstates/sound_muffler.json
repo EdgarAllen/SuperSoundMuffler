@@ -1,0 +1,15 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "particle": "supersoundmuffler:block/sound_muffler"
+    },
+    "model": "supersoundmuffler:sound_muffler",
+    "transform": "forge:default-block"
+  },
+
+  "variants": {
+    "normal": [{ }],
+    "inventory": [{ }]
+  }
+}

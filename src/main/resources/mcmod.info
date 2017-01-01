@@ -1,0 +1,16 @@
+[
+{
+  "modid": "supersoundmuffler",
+  "name": "Super Sound Muffler",
+  "description": "A block that allows you to select which sounds to muffle.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["EdgarAllen"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
