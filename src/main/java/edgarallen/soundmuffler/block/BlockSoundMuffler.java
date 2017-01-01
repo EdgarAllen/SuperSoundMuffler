@@ -56,7 +56,7 @@ public class BlockSoundMuffler extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof TileEntitySoundMuffler && !te.isInvalid()) {
             playerIn.openGui(SuperSoundMuffler.instance, GuiHandler.SOUND_MUFFLER_GUI_ID, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -151,7 +151,8 @@ public class BlockSoundMuffler extends BlockContainer {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+//    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+    public void func_190948_a(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
         if(stack.hasTagCompound()) {
             NBTTagCompound compound = stack.getTagCompound();
 
