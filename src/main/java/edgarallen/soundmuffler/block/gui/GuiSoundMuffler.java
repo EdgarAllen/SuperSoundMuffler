@@ -72,6 +72,13 @@ public class GuiSoundMuffler extends GuiContainer {
     public void updateScreen() {
         super.updateScreen();
         removeSoundButton.enabled = soundList.getSelectedIndex() >= 0;
+
+        List<ResourceLocation> sounds = tileEntity.getMuffledSounds();
+        Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
+        soundList.setSounds(sounds);
+
+        String key = tileEntity.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
+        modeButton.displayString = I18n.format(key);
     }
 
     @Override
@@ -204,7 +211,6 @@ public class GuiSoundMuffler extends GuiContainer {
 
         void setSounds(List<ResourceLocation> sounds) {
             this.sounds = sounds;
-            selectedIndex = -1;
         }
 
         List<ResourceLocation> getSounds() { return sounds; }
