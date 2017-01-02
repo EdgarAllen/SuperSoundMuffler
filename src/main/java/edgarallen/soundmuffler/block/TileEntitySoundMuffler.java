@@ -3,6 +3,8 @@ package edgarallen.soundmuffler.block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -64,6 +66,17 @@ public class TileEntitySoundMuffler extends TileEntity {
         NBTTagCompound compound = super.getUpdateTag();
         compound = writeNBT(compound);
         return compound;
+    }
+
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        NBTTagCompound compound = getUpdateTag();
+        return new SPacketUpdateTileEntity(pos, 0, compound);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+        readFromNBT(packet.getNbtCompound());
     }
 
     @Override
