@@ -7,37 +7,31 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageAddRemoveSound implements IMessage {
+import static edgarallen.soundmuffler.network.messages.MessageToggleWhiteList.Type.Bauble;
 
-    private BlockPos pos;
-    private ResourceLocation sound;
-    private Type type;
-    private Action action;
+public class MessageToggleWhiteList implements IMessage {
 
-    public MessageAddRemoveSound() { }
+    BlockPos pos;
+    Type type;
 
-    public MessageAddRemoveSound(BlockPos pos, ResourceLocation sound, Type type, Action action) {
+    public MessageToggleWhiteList() { }
+
+    public MessageToggleWhiteList(BlockPos pos, Type type) {
         this.pos = pos;
-        this.sound = sound;
         this.type = type;
-        this.action = action;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
         pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-        sound = new ResourceLocation(ByteBufUtils.readUTF8String(buf));
         type = buf.readBoolean() ? Type.Bauble : Type.TileEntity;
-        action = buf.readBoolean() ? Action.Add : Action.Remove;
     }
 
     @Override
@@ -45,16 +39,14 @@ public class MessageAddRemoveSound implements IMessage {
         buf.writeInt(pos.getX());
         buf.writeInt(pos.getY());
         buf.writeInt(pos.getZ());
-        ByteBufUtils.writeUTF8String(buf, sound.toString());
-        buf.writeBoolean(type == Type.Bauble);
-        buf.writeBoolean(action == Action.Add);
+        buf.writeBoolean(type == Bauble);
     }
 
-    public static class Handler implements IMessageHandler<MessageAddRemoveSound, IMessage> {
+    public static class Handler implements IMessageHandler<MessageToggleWhiteList, IMessage> {
         public Handler() { }
 
         @Override
-        public IMessage onMessage(final MessageAddRemoveSound message, final MessageContext ctx) {
+        public IMessage onMessage(final MessageToggleWhiteList message, final MessageContext ctx) {
             IThreadListener thread = FMLCommonHandler.instance().getWorldThread(ctx.netHandler);
             if (thread.isCallingFromMinecraftThread()) {
                 handle(message,ctx);
@@ -65,7 +57,7 @@ public class MessageAddRemoveSound implements IMessage {
             return null;
         }
 
-        private void handle(MessageAddRemoveSound message, MessageContext ctx) {
+        private void handle(MessageToggleWhiteList message, MessageContext ctx) {
             switch (message.type) {
                 case Bauble:
                     handleBauble(message, ctx);
@@ -76,37 +68,25 @@ public class MessageAddRemoveSound implements IMessage {
             }
         }
 
-        private void handleBauble(MessageAddRemoveSound message, MessageContext ctx) {
+        private void handleBauble(MessageToggleWhiteList message, MessageContext ctx) {
             EntityPlayer player = ctx.getServerHandler().playerEntity;
-            if (player != null) {
+            if(player != null) {
                 ItemStack stack = player.getHeldItemMainhand();
                 if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.proxy.itemSoundMufflerBauble) {
-                    if(message.action == Action.Add) {
-                        SuperSoundMuffler.proxy.itemSoundMufflerBauble.muffleSound(stack, message.sound);
-                    } else {
-                        SuperSoundMuffler.proxy.itemSoundMufflerBauble.unmuffleSound(stack, message.sound);
-                    }
+                    SuperSoundMuffler.proxy.itemSoundMufflerBauble.toggleWhiteList(stack);
                 }
             }
         }
 
-        private void handleTileEntity(MessageAddRemoveSound message, MessageContext ctx) {
+        private void handleTileEntity(MessageToggleWhiteList message, MessageContext ctx) {
             World world = ctx.getServerHandler().playerEntity.world;
             TileEntity te = world.getTileEntity(message.pos);
+
             if (te != null && te instanceof TileEntitySoundMuffler) {
                 TileEntitySoundMuffler tileEntity = (TileEntitySoundMuffler) te;
-                if(message.action == Action.Add) {
-                    tileEntity.muffleSound(message.sound);
-                } else {
-                    tileEntity.unmuffleSound(message.sound);
-                }
+                tileEntity.toggleWhiteListMode();
             }
         }
-    }
-
-    public enum Action {
-        Add,
-        Remove
     }
 
     public enum Type {
