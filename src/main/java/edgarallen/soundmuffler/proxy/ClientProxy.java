@@ -7,5 +7,6 @@ public class ClientProxy extends CommonProxy {
         super.preInit();
 
         blockSoundMuffler.registerModels();
+        itemSoundMufflerBauble.registerModels();
     }
 }

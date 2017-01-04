@@ -86,7 +86,6 @@ public class TileEntitySoundMuffler extends TileEntity {
 
     boolean isDefault() {
         return (whiteListMode && muffledSounds.isEmpty());
-
     }
     //endregion
 

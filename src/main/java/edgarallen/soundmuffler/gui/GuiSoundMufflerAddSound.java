@@ -1,9 +1,7 @@
-package edgarallen.soundmuffler.block.gui;
+package edgarallen.soundmuffler.gui;
 
 import edgarallen.soundmuffler.SuperSoundMuffler;
-import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
-import edgarallen.soundmuffler.network.ThePacketeer;
-import edgarallen.soundmuffler.network.messages.MessageAddRemoveSound;
+import edgarallen.soundmuffler.gui.data.IMufflerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -30,16 +28,14 @@ import java.util.stream.Collectors;
 public class GuiSoundMufflerAddSound extends GuiContainer {
     private static final ResourceLocation guiTexture = new ResourceLocation(SuperSoundMuffler.MOD_ID, "textures/gui/sound_muffler_add_sound.png");
 
-    //region Constants
     private static final int KEYCODE_ENTER = 28;
     private static final int KEYCODE_KP_ENTER = 156;
     private static final int TEXT_COLOR_FOCUSED = 0xE0E0E0;
     private static final int TEXT_COLOR_ACTIVE = 0xAAAAAA;
     private static final int TEXT_COLOR_DISABLED = 0x404040;
-    //endregion
 
     private final GuiScreen prevScreen;
-    private final TileEntitySoundMuffler tileEntity;
+    private final IMufflerAccessor muffler;
 
     private GuiShortButton allSoundsButton;
     private GuiShortButton recentSoundsButton;
@@ -52,9 +48,9 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     private boolean showAllSounds = true;
 
     private final List<ResourceLocation> recentSounds;
-    private static List<ResourceLocation> allSounds;
+    private List<ResourceLocation> allSounds;
 
-    GuiSoundMufflerAddSound(GuiScreen prevScreen, TileEntitySoundMuffler tile, List<ResourceLocation> recentSounds) {
+    GuiSoundMufflerAddSound(GuiScreen prevScreen, IMufflerAccessor muffler, List<ResourceLocation> recentSounds) {
         super(new Container() {
             @Override
             public boolean canInteractWith(EntityPlayer playerIn) {
@@ -65,7 +61,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         this.xSize = 256;
         this.ySize = 170;
         this.prevScreen = prevScreen;
-        this.tileEntity = tile;
+        this.muffler = muffler;
         this.recentSounds = recentSounds;
         lazyLoadAllSoundsList();
     }
@@ -130,8 +126,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
             if(button.id == addSoundButton.id) {
                 ResourceLocation sound = soundList.getSounds().get(soundList.getSelectedIndex());
                 if(sound != null) {
-                    tileEntity.muffleSound(sound);
-                    ThePacketeer.INSTANCE.sendToServer(new MessageAddRemoveSound(tileEntity.getPos(), sound, MessageAddRemoveSound.Action.Add));
+                    muffler.muffleSound(sound);
                 }
 
                 mc.displayGuiScreen(prevScreen);
@@ -233,7 +228,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         @SuppressWarnings("unchecked")
         @Override
         public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-            if (visible && tileEntity != null) {
+            if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
