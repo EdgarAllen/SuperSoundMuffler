@@ -1,10 +1,7 @@
-package edgarallen.soundmuffler.block.gui;
+package edgarallen.soundmuffler.gui;
 
 import edgarallen.soundmuffler.SuperSoundMuffler;
-import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
-import edgarallen.soundmuffler.network.ThePacketeer;
-import edgarallen.soundmuffler.network.messages.MessageAddRemoveSound;
-import edgarallen.soundmuffler.network.messages.MessageToggleWhiteListMode;
+import edgarallen.soundmuffler.gui.data.IMufflerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -27,14 +24,14 @@ public class GuiSoundMuffler extends GuiContainer {
 
     private static final ResourceLocation guiTexture = new ResourceLocation(SuperSoundMuffler.MOD_ID, "textures/gui/sound_muffler.png");
 
-    private final TileEntitySoundMuffler tileEntity;
+    private final IMufflerAccessor muffler;
 
     private GuiShortWideButton modeButton;
     private GuiShortButton addSoundButton;
     private GuiShortButton removeSoundButton;
     private GuiSoundList soundList;
 
-    public GuiSoundMuffler(TileEntitySoundMuffler tile) {
+    public GuiSoundMuffler(IMufflerAccessor muffler) {
         super(new Container() {
             @Override
             public boolean canInteractWith(EntityPlayer playerIn) {
@@ -44,13 +41,13 @@ public class GuiSoundMuffler extends GuiContainer {
 
         this.xSize = 256;
         this.ySize = 170;
-        this.tileEntity = tile;
+        this.muffler = muffler;
     }
 
     @Override
     public void initGui() {
         super.initGui();
-        String key = tileEntity.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
+        String key = muffler.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
         modeButton = new GuiShortWideButton(0, guiLeft + 159, guiTop + 5, I18n.format(key));
         buttonList.add(modeButton);
 
@@ -63,7 +60,7 @@ public class GuiSoundMuffler extends GuiContainer {
 
         soundList = new GuiSoundList(240, 126, guiTop + 22, guiTop + 148, guiLeft + 8, 14);
 
-        List<ResourceLocation> sounds = tileEntity.getMuffledSounds();
+        List<ResourceLocation> sounds = muffler.getMuffledSounds();
         Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
         soundList.setSounds(sounds);
     }
@@ -73,11 +70,11 @@ public class GuiSoundMuffler extends GuiContainer {
         super.updateScreen();
         removeSoundButton.enabled = soundList.getSelectedIndex() >= 0;
 
-        List<ResourceLocation> sounds = tileEntity.getMuffledSounds();
+        List<ResourceLocation> sounds = muffler.getMuffledSounds();
         Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
         soundList.setSounds(sounds);
 
-        String key = tileEntity.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
+        String key = muffler.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
         modeButton.displayString = I18n.format(key);
     }
 
@@ -85,18 +82,16 @@ public class GuiSoundMuffler extends GuiContainer {
     protected void actionPerformed(GuiButton button) throws IOException {
         if(button.enabled) {
             if (button.id == modeButton.id) {
-                ThePacketeer.INSTANCE.sendToServer(new MessageToggleWhiteListMode(tileEntity.getPos()));
-                tileEntity.toggleWhiteListMode();
-                String key = tileEntity.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
+                muffler.toggleWhiteList();
+                String key = muffler.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
                 modeButton.displayString = I18n.format(key);
             } else if (button.id == addSoundButton.id) {
                 Set<ResourceLocation> unique = new HashSet<>(SuperSoundMuffler.instance.recentSounds);
-                Minecraft.getMinecraft().displayGuiScreen(new GuiSoundMufflerAddSound(this, tileEntity, new ArrayList<>(unique)));
+                Minecraft.getMinecraft().displayGuiScreen(new GuiSoundMufflerAddSound(this, muffler, new ArrayList<>(unique)));
             } else if(button.id == removeSoundButton.id) {
                 ResourceLocation sound = soundList.getSounds().remove(soundList.getSelectedIndex());
                 soundList.selectIndex(-1);
-                tileEntity.unmuffleSound(sound);
-                ThePacketeer.INSTANCE.sendToServer(new MessageAddRemoveSound(tileEntity.getPos(), sound, MessageAddRemoveSound.Action.Remove));
+                muffler.unmuffleSound(sound);
             }
         }
     }
@@ -126,7 +121,7 @@ public class GuiSoundMuffler extends GuiContainer {
         @SuppressWarnings("unchecked")
         @Override
         public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-            if (visible && tileEntity != null) {
+            if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -153,7 +148,7 @@ public class GuiSoundMuffler extends GuiContainer {
         @SuppressWarnings("unchecked")
         @Override
         public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-            if (visible && tileEntity != null) {
+            if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -211,7 +206,6 @@ public class GuiSoundMuffler extends GuiContainer {
 
         void setSounds(List<ResourceLocation> sounds) {
             this.sounds = sounds;
-//            selectedIndex = -1;
         }
 
         List<ResourceLocation> getSounds() { return sounds; }
