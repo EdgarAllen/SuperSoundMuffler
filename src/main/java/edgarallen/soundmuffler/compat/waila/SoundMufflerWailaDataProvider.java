@@ -59,7 +59,7 @@ public class SoundMufflerWailaDataProvider implements IWailaDataProvider {
     }
 
     public static void register() {
-        FMLInterModComms.sendMessage("waila", "register", "edgarallen.soundmuffler.compat.waila.SoundMufflerWailaDataProvider.callbackRegister");
+        FMLInterModComms.sendMessage("Waila", "register", "edgarallen.soundmuffler.compat.waila.SoundMufflerWailaDataProvider.callbackRegister");
     }
 
     public static void callbackRegister(IWailaRegistrar registrar) {

@@ -69,7 +69,7 @@ public class SuperSoundMuffler {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-        if(Loader.isModLoaded("waila")) {
+        if(Loader.isModLoaded("Waila")) {
             SoundMufflerWailaDataProvider.register();
         }
     }
