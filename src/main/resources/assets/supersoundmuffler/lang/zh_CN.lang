@@ -1,0 +1,22 @@
+tile.sound_muffler.name=超级消音器
+tile.sound_muffler.gui.button.add=添加
+tile.sound_muffler.gui.button.remove=清除
+tile.sound_muffler.add_sound.gui.title=添加声音...
+tile.sound_muffler.add_sound.gui.button.add=添加
+tile.sound_muffler.add_sound.gui.button.cancel=撤消
+tile.sound_muffler.add_sound.gui.button.all=全部
+tile.sound_muffler.add_sound.gui.button.recent=最近
+tile.sound_muffler.add_sound.gui.search=搜索...
+tile.sound_muffler.gui.button.mode.white_list=白名单
+tile.sound_muffler.gui.button.mode.black_list=黑名单
+
+item.sound_muffler.tooltip.mode.white_list=模式：§8白名单
+item.sound_muffler.tooltip.mode.black_list=模式: §8黑名单
+item.sound_muffler.tooltip.sounds.count=消声种类: §8%d
+item.sound_muffler.tooltip.sound=§8- %s
+
+item.sound_muffler_bauble.name=超级消音器携带版
+item.sound_muffler_bauble.tooltip.header=§8§o首饰版消音器
+
+jei.tile.sound_muffler=消除8格范围内的声音。可以进行配置来消除特定的声音。
+jei.item.sound_muffler_bauble=消音器的的携带首饰（bauble mod）版本。 右键单击打开配置GUI。潜行右击可启用/禁用其效果。
