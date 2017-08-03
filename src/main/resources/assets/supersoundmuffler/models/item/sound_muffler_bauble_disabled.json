@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "supersoundmuffler:item/sound_muffler_bauble_disabled"
+  }
+}

@@ -23,6 +23,5 @@ run
 
 .git
 classes/
-models/
 libs/
 *.hprof

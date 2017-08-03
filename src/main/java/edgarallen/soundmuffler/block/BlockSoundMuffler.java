@@ -8,10 +8,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -26,11 +27,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,7 +144,8 @@ public class BlockSoundMuffler extends BlockContainer {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean advanced) {
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
         if(stack.hasTagCompound()) {
             NBTTagCompound compound = stack.getTagCompound();
 
@@ -170,16 +172,9 @@ public class BlockSoundMuffler extends BlockContainer {
         }
     }
 
-    public void registerRecipes() {
-        GameRegistry.addShapedRecipe(new ItemStack(this, 1), " # ", "#X#", " # ", '#', Blocks.WOOL, 'X', Blocks.NOTEBLOCK );
-
-        // Clear NBT recipe
-        GameRegistry.addShapelessRecipe(new ItemStack(this, 1), new ItemStack(this, 1));
-    }
-
     @SideOnly(Side.CLIENT)
     public void registerModels() {
-        ModelLoader.setCustomModelResourceLocation(SuperSoundMuffler.proxy.itemSoundMuffler, 0, new ModelResourceLocation(getRegistryName().toString(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName().toString(), "inventory"));
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntitySoundMuffler.class, new RenderTileSoundMuffler());
     }
 }

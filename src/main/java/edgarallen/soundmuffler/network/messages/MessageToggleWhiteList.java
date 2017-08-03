@@ -69,17 +69,17 @@ public class MessageToggleWhiteList implements IMessage {
         }
 
         private void handleBauble(MessageToggleWhiteList message, MessageContext ctx) {
-            EntityPlayer player = ctx.getServerHandler().playerEntity;
+            EntityPlayer player = ctx.getServerHandler().player;
             if(player != null) {
                 ItemStack stack = player.getHeldItemMainhand();
-                if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.proxy.itemSoundMufflerBauble) {
-                    SuperSoundMuffler.proxy.itemSoundMufflerBauble.toggleWhiteList(stack);
+                if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.itemSoundMufflerBauble) {
+                    SuperSoundMuffler.itemSoundMufflerBauble.toggleWhiteList(stack);
                 }
             }
         }
 
         private void handleTileEntity(MessageToggleWhiteList message, MessageContext ctx) {
-            World world = ctx.getServerHandler().playerEntity.world;
+            World world = ctx.getServerHandler().player.world;
             TileEntity te = world.getTileEntity(message.pos);
 
             if (te != null && te instanceof TileEntitySoundMuffler) {

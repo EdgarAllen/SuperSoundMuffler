@@ -61,7 +61,7 @@ public class GuiSoundMuffler extends GuiContainer {
         soundList = new GuiSoundList(240, 126, guiTop + 22, guiTop + 148, guiLeft + 8, 14);
 
         List<ResourceLocation> sounds = muffler.getMuffledSounds();
-        Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
+        Collections.sort(sounds, Comparator.comparing(ResourceLocation::toString));
         soundList.setSounds(sounds);
     }
 
@@ -71,7 +71,7 @@ public class GuiSoundMuffler extends GuiContainer {
         removeSoundButton.enabled = soundList.getSelectedIndex() >= 0;
 
         List<ResourceLocation> sounds = muffler.getMuffledSounds();
-        Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
+        Collections.sort(sounds, Comparator.comparing(ResourceLocation::toString));
         soundList.setSounds(sounds);
 
         String key = muffler.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
@@ -98,7 +98,7 @@ public class GuiSoundMuffler extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        fontRendererObj.drawString(SuperSoundMuffler.NAME, 8, 9, 0x404040);
+        fontRenderer.drawString(SuperSoundMuffler.NAME, 8, 9, 0x404040);
     }
 
     @Override
@@ -120,13 +120,13 @@ public class GuiSoundMuffler extends GuiContainer {
 
         @SuppressWarnings("unchecked")
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
             if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
-                drawTexturedModalRect(xPosition, yPosition, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
+                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+                drawTexturedModalRect(x, y, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
 
                 int colour = 0xE0E0E0;
                 if (!enabled) {
@@ -134,7 +134,7 @@ public class GuiSoundMuffler extends GuiContainer {
                 } else if (hover) {
                     colour = 0xFFFFA0;
                 }
-                drawCenteredString(fontRendererObj, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, colour);
+                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
                 RenderHelper.enableStandardItemLighting();
             }
         }
@@ -147,13 +147,13 @@ public class GuiSoundMuffler extends GuiContainer {
 
         @SuppressWarnings("unchecked")
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
             if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
-                drawTexturedModalRect(xPosition, yPosition, 44, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
+                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+                drawTexturedModalRect(x, y, 44, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
 
                 int colour = 0xE0E0E0;
                 if (!enabled) {
@@ -162,7 +162,7 @@ public class GuiSoundMuffler extends GuiContainer {
                     colour = 0xFFFFA0;
                 }
 
-                drawCenteredString(fontRendererObj, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, colour);
+                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
                 RenderHelper.enableStandardItemLighting();
             }
         }
@@ -201,7 +201,7 @@ public class GuiSoundMuffler extends GuiContainer {
         @Override
         protected void drawSlot(int idx, int right, int top, int height, Tessellator tess) {
             ResourceLocation sound = sounds.get(idx);
-            fontRendererObj.drawString(fontRendererObj.trimStringToWidth(sound.toString(), listWidth - 10), left + 3 , top +  2, 0xCCCCCC);
+            fontRenderer.drawString(fontRenderer.trimStringToWidth(sound.toString(), listWidth - 10), left + 3 , top +  2, 0xCCCCCC);
         }
 
         void setSounds(List<ResourceLocation> sounds) {

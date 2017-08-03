@@ -7,10 +7,10 @@ import edgarallen.soundmuffler.gui.GuiHandler;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
@@ -24,7 +24,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -34,7 +33,7 @@ import java.util.List;
 
 @Optional.Interface(modid = "baubles", iface = "baubles.api.IBauble")
 public class ItemSoundMufflerBauble extends Item implements IBauble {
-    private static final String NAME = "sound_muffler_bauble";
+    public static final String NAME = "sound_muffler_bauble";
 
     public ItemSoundMufflerBauble() {
         setUnlocalizedName(NAME);
@@ -55,13 +54,6 @@ public class ItemSoundMufflerBauble extends Item implements IBauble {
     @SideOnly(Side.CLIENT)
     public void registerModels() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName().toString(), "inventory"));
-    }
-
-    public void registerRecipes() {
-        GameRegistry.addShapedRecipe(new ItemStack(this, 1), " # ", "# #", " X ", '#', Items.STRING, 'X', SuperSoundMuffler.proxy.blockSoundMuffler);
-
-        // Clear NBT recipe
-        GameRegistry.addShapelessRecipe(new ItemStack(this, 1), new ItemStack(this, 1));
     }
 
     @Optional.Method(modid = "baubles")
@@ -87,7 +79,8 @@ public class ItemSoundMufflerBauble extends Item implements IBauble {
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         tooltip.add(I18n.format("item.sound_muffler_bauble.tooltip.header"));
 
         if(stack.hasTagCompound()) {

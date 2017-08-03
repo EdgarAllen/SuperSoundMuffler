@@ -31,7 +31,7 @@ public class GuiHandler implements IGuiHandler {
             }
         } else if(ID == SOUND_MUFFLER_BAUBLE_GUI_ID) {
             ItemStack stack = player.getHeldItemMainhand();
-            if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.proxy.itemSoundMufflerBauble) {
+            if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.itemSoundMufflerBauble) {
                 IMufflerAccessor muffler = new MufflerBauble(player);
                 return new GuiSoundMuffler(muffler);
             }

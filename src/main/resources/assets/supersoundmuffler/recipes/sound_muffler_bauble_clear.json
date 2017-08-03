@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item" : "supersoundmuffler:sound_muffler_bauble" }
+  ],
+  "result": { "item": "supersoundmuffler:sound_muffler_bauble" }
+}

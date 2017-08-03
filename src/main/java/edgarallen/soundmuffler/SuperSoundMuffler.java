@@ -4,6 +4,8 @@ package edgarallen.soundmuffler;
 import baubles.api.cap.BaublesCapabilities;
 import baubles.api.cap.IBaublesItemHandler;
 import com.google.common.collect.EvictingQueue;
+import edgarallen.soundmuffler.bauble.ItemSoundMufflerBauble;
+import edgarallen.soundmuffler.block.BlockSoundMuffler;
 import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
 import edgarallen.soundmuffler.compat.waila.SoundMufflerWailaDataProvider;
 import edgarallen.soundmuffler.gui.GuiHandler;
@@ -31,6 +33,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +45,7 @@ import java.util.Queue;
 public class SuperSoundMuffler {
     public static final String MOD_ID = "supersoundmuffler";
     public static final String NAME = "Super Sound Muffler";
-    public static final String VERSION = "1.0.1.4";
+    public static final String VERSION = "1.0.1.5";
     public static final String DEPENDENCIES = "after:baubles;after:theoneprobe;after:waila";
 
     @Mod.Instance(MOD_ID)
@@ -54,11 +57,16 @@ public class SuperSoundMuffler {
     @SidedProxy(clientSide = "edgarallen.soundmuffler.proxy.ClientProxy", serverSide = "edgarallen.soundmuffler.proxy.CommonProxy")
     public static CommonProxy proxy;
 
+    @GameRegistry.ObjectHolder(BlockSoundMuffler.NAME)
+    public static BlockSoundMuffler blockSoundMuffler;
+
+    @GameRegistry.ObjectHolder(ItemSoundMufflerBauble.NAME)
+    public static ItemSoundMufflerBauble itemSoundMufflerBauble;
+
     public Queue<ResourceLocation> recentSounds = EvictingQueue.create(16);
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        proxy.preInit();
         ThePacketeer.init();
 
         if(event.getSide() == Side.CLIENT) {
@@ -76,7 +84,6 @@ public class SuperSoundMuffler {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        proxy.registerRecipes();
         checkBaubleSlots = Loader.isModLoaded("baubles");
     }
 
@@ -101,8 +108,8 @@ public class SuperSoundMuffler {
             InventoryPlayer inventory = player.inventory;
             for (int slot = 0; slot < inventory.getSizeInventory(); ++slot) {
                 ItemStack stack = inventory.getStackInSlot(slot);
-                if(!stack.isEmpty() && stack.getItem() == proxy.itemSoundMufflerBauble) {
-                    if(proxy.itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
+                if(!stack.isEmpty() && stack.getItem() == itemSoundMufflerBauble) {
+                    if(itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
                         event.setResultSound(null);
                         return true;
                     }
@@ -113,8 +120,8 @@ public class SuperSoundMuffler {
                 IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, player.getHorizontalFacing());
                 for(int slot = 0; slot < baubles.getSlots(); ++slot) {
                     ItemStack stack = baubles.getStackInSlot(slot);
-                    if (!stack.isEmpty() && stack.getItem() == proxy.itemSoundMufflerBauble) {
-                        if(proxy.itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
+                    if (!stack.isEmpty() && stack.getItem() == itemSoundMufflerBauble) {
+                        if(itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
                             event.setResultSound(null);
                             return true;
                         }

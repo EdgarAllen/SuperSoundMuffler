@@ -1,0 +1,35 @@
+{
+  "parent": "supersoundmuffler:block/sound_muffler",
+  "display": {
+    "gui": {
+      "rotation": [ 30, 315, 0 ],
+      "translation": [ 0, 0, 0],
+      "scale":[ 1, 1, 1 ]
+    },
+    "ground": {
+      "rotation": [ 0, 0, 0 ],
+      "translation": [ 0, 3, 0],
+      "scale":[ 0.5, 0.5, 0.5 ]
+    },
+    "fixed": {
+      "rotation": [ 0, 0, 0 ],
+      "translation": [ 0, 0, 0],
+      "scale":[ 1, 1, 1 ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [ 75, 315, 0 ],
+      "translation": [ 0, 2.5, 0],
+      "scale": [ 0.75, 0.75, 0.75 ]
+    },
+    "firstperson_righthand": {
+      "rotation": [ 0, 315, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.80, 0.80, 0.80 ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [ 0, 315, 0 ],
+      "translation": [ 0, 0, 0 ],
+      "scale": [ 0.80, 0.80, 0.80 ]
+    }
+  }
+}

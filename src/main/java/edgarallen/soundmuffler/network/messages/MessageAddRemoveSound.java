@@ -77,21 +77,21 @@ public class MessageAddRemoveSound implements IMessage {
         }
 
         private void handleBauble(MessageAddRemoveSound message, MessageContext ctx) {
-            EntityPlayer player = ctx.getServerHandler().playerEntity;
+            EntityPlayer player = ctx.getServerHandler().player;
             if (player != null) {
                 ItemStack stack = player.getHeldItemMainhand();
-                if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.proxy.itemSoundMufflerBauble) {
+                if(!stack.isEmpty() && stack.getItem() == SuperSoundMuffler.itemSoundMufflerBauble) {
                     if(message.action == Action.Add) {
-                        SuperSoundMuffler.proxy.itemSoundMufflerBauble.muffleSound(stack, message.sound);
+                        SuperSoundMuffler.itemSoundMufflerBauble.muffleSound(stack, message.sound);
                     } else {
-                        SuperSoundMuffler.proxy.itemSoundMufflerBauble.unmuffleSound(stack, message.sound);
+                        SuperSoundMuffler.itemSoundMufflerBauble.unmuffleSound(stack, message.sound);
                     }
                 }
             }
         }
 
         private void handleTileEntity(MessageAddRemoveSound message, MessageContext ctx) {
-            World world = ctx.getServerHandler().playerEntity.world;
+            World world = ctx.getServerHandler().player.world;
             TileEntity te = world.getTileEntity(message.pos);
             if (te != null && te instanceof TileEntitySoundMuffler) {
                 TileEntitySoundMuffler tileEntity = (TileEntitySoundMuffler) te;

@@ -20,7 +20,7 @@ public class RenderTileSoundMuffler extends TileEntitySpecialRenderer<TileEntity
      * for dat sexy sinusoidal motion
      */
     @Override
-    public void renderTileEntityAt(TileEntitySoundMuffler tile, double x, double y, double z, float partialTicks, int destroyStage) {
+    public void render(TileEntitySoundMuffler tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tile != null) {
             if (!tile.getWorld().isBlockLoaded(tile.getPos(), false)) {
                 return;

@@ -1,0 +1,19 @@
+{
+  "result": {
+    "item": "supersoundmuffler:sound_muffler_bauble"
+  },
+  "pattern": [
+    " W ",
+    "WNW",
+    " W "
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "W": {
+      "item": "minecraft:string"
+    },
+    "N": {
+      "item": "supersoundmuffler:sound_muffler"
+    }
+  }
+}

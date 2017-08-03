@@ -91,7 +91,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         soundList.setSounds(allSounds);
 
         Keyboard.enableRepeatEvents(true);
-        searchField = new GuiTextField(2, fontRendererObj, guiLeft + 11, guiTop + 139, 232, fontRendererObj.FONT_HEIGHT);
+        searchField = new GuiTextField(2, fontRenderer, guiLeft + 11, guiTop + 139, 232, fontRenderer.FONT_HEIGHT);
         searchField.setMaxStringLength(256);
         searchField.setEnableBackgroundDrawing(false);
         searchField.setTextColor(0xE0E0E0);
@@ -166,7 +166,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
         searchField.mouseClicked(x, y, button);
-        if (button == 1 && x >= searchField.xPosition && x < searchField.xPosition + searchField.width && y >= searchField.yPosition && y < searchField.yPosition + searchField.height) {
+        if (button == 1 && x >= searchField.x && x < searchField.x + searchField.width && y >= searchField.y && y < searchField.y + searchField.height) {
             searchField.setText("");
         }
     }
@@ -195,7 +195,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        fontRendererObj.drawString(I18n.format("tile.sound_muffler.add_sound.gui.title"), 8, 9, 0x404040);
+        fontRenderer.drawString(I18n.format("tile.sound_muffler.add_sound.gui.title"), 8, 9, 0x404040);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
 
     private void drawSearchField() {
         if(searchField.getText().isEmpty() && !searchField.isFocused()) {
-            fontRendererObj.drawString(I18n.format("tile.sound_muffler.add_sound.gui.search"), guiLeft + 11, guiTop + 139, TEXT_COLOR_DISABLED);
+            fontRenderer.drawString(I18n.format("tile.sound_muffler.add_sound.gui.search"), guiLeft + 11, guiTop + 139, TEXT_COLOR_DISABLED);
         } else {
             searchField.setTextColor(searchField.isFocused() ? TEXT_COLOR_FOCUSED : TEXT_COLOR_ACTIVE);
             searchField.drawTextBox();
@@ -227,13 +227,13 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
 
         @SuppressWarnings("unchecked")
         @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
             if (visible) {
                 RenderHelper.disableStandardItemLighting();
                 mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
-                drawTexturedModalRect(xPosition, yPosition, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
+                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+                drawTexturedModalRect(x, y, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
 
                 int colour = 0xE0E0E0;
                 if (!enabled) {
@@ -241,7 +241,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
                 } else if (hover) {
                     colour = 0xFFFFA0;
                 }
-                drawCenteredString(fontRendererObj, displayString, xPosition + width / 2, yPosition + (height - 8) / 2, colour);
+                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
 
                 RenderHelper.enableStandardItemLighting();
             }
@@ -281,7 +281,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         @Override
         protected void drawSlot(int idx, int right, int top, int height, Tessellator tess) {
             ResourceLocation sound = sounds.get(idx);
-            fontRendererObj.drawString(fontRendererObj.trimStringToWidth(sound.toString(), listWidth - 10), left + 3 , top +  2, 0xCCCCCC);
+            fontRenderer.drawString(fontRenderer.trimStringToWidth(sound.toString(), listWidth - 10), left + 3 , top +  2, 0xCCCCCC);
         }
 
         void setSounds(List<ResourceLocation> sounds) {
