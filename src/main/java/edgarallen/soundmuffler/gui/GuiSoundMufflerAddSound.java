@@ -22,6 +22,7 @@ import org.lwjgl.input.Mouse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     private void lazyLoadAllSoundsList() {
         allSounds = new ArrayList<>();
         allSounds.addAll(SoundEvent.REGISTRY.getKeys());
-        Collections.sort(allSounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
+        allSounds.sort(Comparator.comparing(ResourceLocation::toString));
     }
 
     @Override
@@ -124,9 +125,11 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
             }
 
             if(button.id == addSoundButton.id) {
-                ResourceLocation sound = soundList.getSounds().get(soundList.getSelectedIndex());
-                if(sound != null) {
-                    muffler.muffleSound(sound);
+                List<ResourceLocation> selectedSounds = soundList.getSelectedSounds();
+                for(ResourceLocation sound : selectedSounds) {
+                    if(sound != null) {
+                        muffler.muffleSound(sound);
+                    }
                 }
 
                 mc.displayGuiScreen(prevScreen);
@@ -151,7 +154,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
             updateSoundsList(showAllSounds ? allSounds : recentSounds);
         }
 
-        addSoundButton.enabled = soundList.getSelectedIndex() >= 0;
+        addSoundButton.enabled = soundList.hasSelectedElements();
     }
 
     private void updateSoundsList(List<ResourceLocation> sounds) {
@@ -251,6 +254,7 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     private final class GuiSoundList extends GuiScrollingList {
         private List<ResourceLocation> sounds;
         private final int slotHeight;
+        private List<Integer> selectedIndicies = new ArrayList<>();
 
         GuiSoundList(int width, int height, int top, int bottom, int left, int slotHeight) {
             super(Minecraft.getMinecraft(), width, height, top, bottom, left, slotHeight, width, height);
@@ -263,11 +267,58 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         }
 
         @Override
-        protected void elementClicked(int index, boolean doubleClick) { }
+        protected void elementClicked(int index, boolean doubleClick) {
+            if(isCtrlKeyDown()) {
+                if(isSelected(index)) {
+                    removeSelection(index);
+                } else {
+                    selectIndex(index);
+                }
+            } else if(isShiftKeyDown()) {
+                clearSelection();
+                int start = index > selectedIndex ? selectedIndex : index;
+                int end = index > selectedIndex ? index : selectedIndex;
+                selectRange(start, end);
+            } else {
+                clearSelection();
+                selectIndex(index);
+            }
+        }
 
         @Override
         protected boolean isSelected(int index) {
-            return index == selectedIndex;
+            for(int i : selectedIndicies) {
+                if(i == index) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        void removeSelection(int index) {
+            for(int i = 0; i < selectedIndicies.size(); i++) {
+                if(selectedIndicies.get(i) == index) {
+                    selectedIndicies.remove(i);
+                    return;
+                }
+            }
+        }
+
+        void selectIndex(int index) {
+            removeSelection(index);
+            selectedIndicies.add(index);
+            selectedIndex = index;
+        }
+
+        void clearSelection() {
+            selectedIndicies.clear();
+        }
+
+        void selectRange(int start, int end) {
+            for(int i = start; i <= end; i++) {
+                selectedIndicies.add(i);
+            }
+            selectedIndex = end;
         }
 
         @Override
@@ -287,10 +338,19 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         void setSounds(List<ResourceLocation> sounds) {
             this.sounds = sounds;
             selectedIndex = -1;
+            selectedIndicies.clear();
         }
 
-        int getSelectedIndex() { return selectedIndex; }
+        boolean hasSelectedElements() { return selectedIndicies.size() > 0; }
 
-        List<ResourceLocation> getSounds() { return sounds; }
+        List<ResourceLocation> getSelectedSounds() {
+            List<ResourceLocation> ret = new ArrayList<>();
+
+            for(int i : selectedIndicies) {
+                ret.add(sounds.get(i));
+            }
+
+            return ret;
+        }
     }
 }
