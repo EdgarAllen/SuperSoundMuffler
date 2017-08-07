@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MufflerBauble implements IMufflerAccessor {
@@ -51,14 +52,13 @@ public class MufflerBauble implements IMufflerAccessor {
             }
         }
 
-        Collections.sort(sounds, (soundA, soundsB) -> soundA.toString().compareTo(soundsB.toString()));
+        Collections.sort(sounds, Comparator.comparing(ResourceLocation::toString));
         return sounds;
     }
 
     @Override
     public void toggleWhiteList() {
         ThePacketeer.INSTANCE.sendToServer(new MessageToggleWhiteList(BlockPos.ORIGIN, MessageToggleWhiteList.Type.Bauble));
-
     }
 
     @Override

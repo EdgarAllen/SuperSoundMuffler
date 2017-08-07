@@ -1,6 +1,7 @@
 package edgarallen.soundmuffler.block;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
@@ -8,6 +9,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -18,6 +20,8 @@ import java.util.List;
 public class TileEntitySoundMuffler extends TileEntity {
     private HashSet<ResourceLocation> muffledSounds = new HashSet<>();
     private boolean whiteListMode = true;
+    private final int[] ranges = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 32, 64, 128, 256 };
+    private int rangeIndex = 7;
 
     //region NBT Serialization
     @Override
@@ -37,6 +41,7 @@ public class TileEntitySoundMuffler extends TileEntity {
         }
         compound.setTag("sounds", tagList);
         compound.setBoolean("whiteList", whiteListMode);
+        compound.setFloat("rangeIndex", rangeIndex);
 
         return compound;
     }
@@ -58,6 +63,7 @@ public class TileEntitySoundMuffler extends TileEntity {
         }
 
         whiteListMode = compound.getBoolean("whiteList");
+        rangeIndex = compound.getInteger("rangeIndex");
     }
 
     @Override
@@ -85,7 +91,7 @@ public class TileEntitySoundMuffler extends TileEntity {
     }
 
     boolean isDefault() {
-        return (whiteListMode && muffledSounds.isEmpty());
+        return (whiteListMode && muffledSounds.isEmpty() && rangeIndex == 7);
     }
     //endregion
 
@@ -125,5 +131,28 @@ public class TileEntitySoundMuffler extends TileEntity {
         }
 
         return muffledSounds.contains(soundLocation);
+    }
+
+    public boolean shouldMuffleSound(ISound sound) {
+        Vec3d centeredPos = new Vec3d(((float)pos.getX()) + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
+        double dist = centeredPos.squareDistanceTo(sound.getXPosF(), sound.getYPosF(), sound.getZPosF());
+        int range = getRange();
+        return dist <= ((range * range) + 1) && shouldMuffleSound(sound.getSoundLocation());
+    }
+
+    public void setRange(int value) {
+        rangeIndex = value;
+
+        markDirty();
+        IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 4);
+    }
+
+    public int getRange() {
+        return ranges[rangeIndex];
+    }
+
+    public int getRangeIndex() {
+        return rangeIndex;
     }
 }

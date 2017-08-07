@@ -1,6 +1,7 @@
 tile.sound_muffler.name=Super Sound Muffler
 tile.sound_muffler.gui.button.add=Add
 tile.sound_muffler.gui.button.remove=Remove
+tile.sound_muffler.gui.slider.range=Range: %d
 tile.sound_muffler.add_sound.gui.title=Add Sound...
 tile.sound_muffler.add_sound.gui.button.add=Add
 tile.sound_muffler.add_sound.gui.button.cancel=Cancel

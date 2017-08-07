@@ -3,6 +3,7 @@ package edgarallen.soundmuffler.gui.data;
 import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
 import edgarallen.soundmuffler.network.ThePacketeer;
 import edgarallen.soundmuffler.network.messages.MessageAddRemoveSound;
+import edgarallen.soundmuffler.network.messages.MessageSetRange;
 import edgarallen.soundmuffler.network.messages.MessageToggleWhiteList;
 import net.minecraft.util.ResourceLocation;
 
@@ -38,5 +39,25 @@ public class MufflerTileEntity implements IMufflerAccessor {
     @Override
     public void unmuffleSound(ResourceLocation sound) {
         ThePacketeer.INSTANCE.sendToServer(new MessageAddRemoveSound(tileEntity.getPos(), sound, MessageAddRemoveSound.Type.TileEntity, MessageAddRemoveSound.Action.Remove));
+    }
+
+    @Override
+    public boolean isRanged() {
+        return true;
+    }
+
+    @Override
+    public int getRange() {
+        return tileEntity.getRange();
+    }
+
+    @Override
+    public int getRangeIndex() {
+        return tileEntity.getRangeIndex();
+    }
+
+    @Override
+    public void setRange(int value) {
+        ThePacketeer.INSTANCE.sendToServer(new MessageSetRange(tileEntity.getPos(), value));
     }
 }

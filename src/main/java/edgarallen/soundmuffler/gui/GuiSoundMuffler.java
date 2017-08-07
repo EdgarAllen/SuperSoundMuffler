@@ -9,9 +9,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.GuiScrollingList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,6 +31,7 @@ public class GuiSoundMuffler extends GuiContainer {
     private GuiShortWideButton modeButton;
     private GuiShortButton addSoundButton;
     private GuiShortButton removeSoundButton;
+    private GuiSlider rangeSlider;
     private GuiSoundList soundList;
 
     public GuiSoundMuffler(IMufflerAccessor muffler) {
@@ -51,12 +54,17 @@ public class GuiSoundMuffler extends GuiContainer {
         modeButton = new GuiShortWideButton(0, guiLeft + 159, guiTop + 5, I18n.format(key));
         buttonList.add(modeButton);
 
-        addSoundButton = new GuiShortButton(1, guiLeft + 7, guiTop + 151, I18n.format("tile.sound_muffler.gui.button.add") );
+        addSoundButton = new GuiShortButton(1, guiLeft + 159, guiTop + 151, I18n.format("tile.sound_muffler.gui.button.add") );
         buttonList.add(addSoundButton);
 
         removeSoundButton = new GuiShortButton(2, guiLeft + 205, guiTop + 151, I18n.format("tile.sound_muffler.gui.button.remove"));
         removeSoundButton.enabled = false;
         buttonList.add(removeSoundButton);
+
+        if(muffler.isRanged()) {
+            rangeSlider = new GuiSlider(3, guiLeft + 7, guiTop + 151, 0f, 19f);
+            buttonList.add(rangeSlider);
+        }
 
         soundList = new GuiSoundList(240, 126, guiTop + 22, guiTop + 148, guiLeft + 8, 14);
 
@@ -270,6 +278,97 @@ public class GuiSoundMuffler extends GuiContainer {
             }
 
             return ret;
+        }
+    }
+
+    private final class GuiSlider extends GuiButton {
+
+        private float sliderValue;
+        public boolean dragging;
+        private final float minValue;
+        private final float maxValue;
+
+        public GuiSlider(int buttonId, int x, int y) {
+            this(buttonId, x, y, 0.0F, 1.0F);
+        }
+
+        public GuiSlider(int buttonId, int x, int y, float minValueIn, float maxValueIn) {
+            super(buttonId, x, y, 128, 14, I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange()));
+            minValue = minValueIn;
+            maxValue = maxValueIn;
+            sliderValue = normalizeValue((float)muffler.getRangeIndex());
+        }
+
+        @Override
+        protected int getHoverState(boolean mouseOver) {
+            return 0;
+        }
+
+        @Override
+        protected void mouseDragged(Minecraft mc, int mouseX, int mouseY) {
+            if (visible) {
+                if (dragging) {
+                    sliderValue = (float)(mouseX - (x + 4)) / (float)(width - 8);
+                    sliderValue = MathHelper.clamp(sliderValue, 0.0F, 1.0F);
+                    float f = denormalizeValue(sliderValue);
+                    muffler.setRange((int) f);
+                    sliderValue = normalizeValue(f);
+                    displayString = I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange());
+                }
+
+                mc.getTextureManager().bindTexture(guiTexture);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                drawTexturedModalRect(x + (int)(sliderValue * (float)(width - 8)), y, 128, 212, 8, 14);
+            }
+        }
+
+        @Override
+        public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
+            if (super.mousePressed(mc, mouseX, mouseY)) {
+                sliderValue = (float)(mouseX - (x + 4)) / (float)(width - 8);
+                sliderValue = MathHelper.clamp(sliderValue, 0.0F, 1.0F);
+                muffler.setRange((int) denormalizeValue(sliderValue));
+                displayString = I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange());
+                dragging = true;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public void mouseReleased(int mouseX, int mouseY) {
+            dragging = false;
+        }
+
+        @Override
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+            if (visible) {
+                RenderHelper.disableStandardItemLighting();
+                mc.getTextureManager().bindTexture(guiTexture);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                drawTexturedModalRect(x, y, 0, 212, width, height);
+                mouseDragged(mc, mouseX, mouseY);
+                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, 0xE0E0E0);
+                RenderHelper.enableStandardItemLighting();
+            }
+        }
+
+        private float normalizeValue(float value) {
+            return MathHelper.clamp(snapToStepClamp(value) / maxValue, 0.0F, 1.0F);
+        }
+
+        private float denormalizeValue(float value) {
+            return snapToStepClamp(maxValue * MathHelper.clamp(value, 0.0F, 1.0F));
+        }
+
+        private float snapToStepClamp(float value) {
+            value = snapToStep(value);
+            return MathHelper.clamp(value, minValue, maxValue);
+        }
+
+        private float snapToStep(float value) {
+            return Math.round(value / 1);
         }
     }
 }

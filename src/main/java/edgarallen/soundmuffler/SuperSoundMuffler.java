@@ -8,6 +8,7 @@ import edgarallen.soundmuffler.bauble.ItemSoundMufflerBauble;
 import edgarallen.soundmuffler.block.BlockSoundMuffler;
 import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
 import edgarallen.soundmuffler.compat.waila.SoundMufflerWailaDataProvider;
+import edgarallen.soundmuffler.config.Config;
 import edgarallen.soundmuffler.gui.GuiHandler;
 import edgarallen.soundmuffler.network.ThePacketeer;
 import edgarallen.soundmuffler.proxy.CommonProxy;
@@ -20,8 +21,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -39,7 +38,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 @Mod(modid = SuperSoundMuffler.MOD_ID, name = SuperSoundMuffler.NAME, version = SuperSoundMuffler.VERSION, dependencies = SuperSoundMuffler.DEPENDENCIES)
 public class SuperSoundMuffler {
@@ -67,6 +68,7 @@ public class SuperSoundMuffler {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        Config.readConfig(event.getSuggestedConfigurationFile());
         ThePacketeer.init();
 
         if(event.getSide() == Side.CLIENT) {
@@ -134,27 +136,14 @@ public class SuperSoundMuffler {
 
     @SideOnly(Side.CLIENT)
     private boolean tryMuffleBlock(PlaySoundEvent event, WorldClient world, ISound sound) {
-        int minX = MathHelper.floor(sound.getXPosF() - 8f);
-        int maxX = MathHelper.ceil(sound.getXPosF() + 8f);
-        int minY = MathHelper.floor(sound.getYPosF() - 8f);
-        int maxY = MathHelper.ceil(sound.getYPosF() + 8f);
-        int minZ = MathHelper.floor(sound.getZPosF() - 8f);
-        int maxZ = MathHelper.ceil(sound.getZPosF() + 8f);
-
-        for(int x = minX; x < maxX; ++x) {
-            for(int z = minZ; z < maxZ; ++z) {
-                for(int y = minY; y < maxY; ++y) {
-                    TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-                    if(tileEntity != null && tileEntity instanceof TileEntitySoundMuffler) {
-                        TileEntitySoundMuffler tileEntitySoundMuffler = (TileEntitySoundMuffler) tileEntity;
-                        if(tileEntitySoundMuffler.shouldMuffleSound(sound.getSoundLocation())) {
-                            event.setResultSound(null);
-                            return true;
-                        }
-                    }
-                }
+        List<TileEntity> mufflers = world.loadedTileEntityList.stream().filter(TileEntitySoundMuffler.class::isInstance).collect(Collectors.toList());
+        for(TileEntity tile : mufflers) {
+            if(((TileEntitySoundMuffler)tile).shouldMuffleSound(sound)) {
+                event.setResultSound(null);
+                return true;
             }
         }
+
         return false;
     }
 
