@@ -12,6 +12,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import java.util.Collections;
+import java.util.Set;
+
 @Mod.EventBusSubscriber
 public class CommonProxy {
     @SubscribeEvent
@@ -25,4 +28,7 @@ public class CommonProxy {
         event.getRegistry().register(new ItemSoundMufflerBauble());
         event.getRegistry().register(new ItemBlock(SuperSoundMuffler.blockSoundMuffler).setRegistryName(SuperSoundMuffler.blockSoundMuffler.getRegistryName()));
     }
+
+    public void cacheMuffler(TileEntitySoundMuffler tileEntity) { }
+    public Set<TileEntitySoundMuffler> getTileEntities() { return Collections.EMPTY_SET; }
 }

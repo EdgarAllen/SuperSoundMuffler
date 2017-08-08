@@ -1,6 +1,7 @@
 package edgarallen.soundmuffler.gui;
 
 import edgarallen.soundmuffler.SuperSoundMuffler;
+import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
 import edgarallen.soundmuffler.gui.data.IMufflerAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -9,29 +10,31 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.client.GuiScrollingList;
+import net.minecraftforge.fml.client.config.GuiButtonExt;
+import net.minecraftforge.fml.client.config.GuiSlider;
+import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
 @SideOnly(Side.CLIENT)
-public class GuiSoundMuffler extends GuiContainer {
+public class GuiSoundMuffler extends GuiContainer implements GuiSlider.ISlider {
 
     private static final ResourceLocation guiTexture = new ResourceLocation(SuperSoundMuffler.MOD_ID, "textures/gui/sound_muffler.png");
 
     private final IMufflerAccessor muffler;
 
-    private GuiShortWideButton modeButton;
-    private GuiShortButton addSoundButton;
-    private GuiShortButton removeSoundButton;
-    private GuiSlider rangeSlider;
+    private GuiButtonExt modeButton;
+    private GuiButtonExt addSoundButton;
+    private GuiButtonExt removeSoundButton;
+    private GuiSliderExt rangeSlider;
     private GuiSoundList soundList;
 
     public GuiSoundMuffler(IMufflerAccessor muffler) {
@@ -51,23 +54,22 @@ public class GuiSoundMuffler extends GuiContainer {
     public void initGui() {
         super.initGui();
         String key = muffler.isWhiteList() ? "tile.sound_muffler.gui.button.mode.white_list" : "tile.sound_muffler.gui.button.mode.black_list";
-        modeButton = new GuiShortWideButton(0, guiLeft + 159, guiTop + 5, I18n.format(key));
+        modeButton = new GuiButtonExt(0, guiLeft + 159, guiTop + 5, 90, 14, I18n.format(key));
         buttonList.add(modeButton);
 
-        addSoundButton = new GuiShortButton(1, guiLeft + 159, guiTop + 151, I18n.format("tile.sound_muffler.gui.button.add") );
+        addSoundButton = new GuiButtonExt(1, guiLeft + 159, guiTop + 151, 44, 14, I18n.format("tile.sound_muffler.gui.button.add"));
         buttonList.add(addSoundButton);
 
-        removeSoundButton = new GuiShortButton(2, guiLeft + 205, guiTop + 151, I18n.format("tile.sound_muffler.gui.button.remove"));
+        removeSoundButton = new GuiButtonExt(2, guiLeft + 205, guiTop + 151,44, 14, I18n.format("tile.sound_muffler.gui.button.remove"));
         removeSoundButton.enabled = false;
         buttonList.add(removeSoundButton);
 
         if(muffler.isRanged()) {
-            rangeSlider = new GuiSlider(3, guiLeft + 7, guiTop + 151, 0f, 19f);
+            rangeSlider = new GuiSliderExt(3, guiLeft + 7, guiTop + 151, 128, 14, I18n.format("tile.sound_muffler.gui.slider.range"), "", 0f, 19f, muffler.getRangeIndex(), false, false, this);
             buttonList.add(rangeSlider);
         }
 
         soundList = new GuiSoundList(240, 126, guiTop + 22, guiTop + 148, guiLeft + 8, 14);
-
         List<ResourceLocation> sounds = muffler.getMuffledSounds();
         sounds.sort(Comparator.comparing(ResourceLocation::toString));
         soundList.setSounds(sounds);
@@ -125,59 +127,10 @@ public class GuiSoundMuffler extends GuiContainer {
         RenderHelper.enableStandardItemLighting();
     }
 
-    private final class GuiShortButton extends GuiButton {
-        GuiShortButton(int id, int xPos, int yPos, String label) {
-            super(id, xPos, yPos, 44, 14, label);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-            if (visible) {
-                RenderHelper.disableStandardItemLighting();
-                mc.getTextureManager().bindTexture(guiTexture);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-                drawTexturedModalRect(x, y, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
-
-                int colour = 0xE0E0E0;
-                if (!enabled) {
-                    colour = 0xA0A0A0;
-                } else if (hover) {
-                    colour = 0xFFFFA0;
-                }
-                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
-                RenderHelper.enableStandardItemLighting();
-            }
-        }
-    }
-
-    private final class GuiShortWideButton extends GuiButton {
-        GuiShortWideButton(int id, int xPos, int yPos, String label) {
-            super(id, xPos, yPos, 90, 14, label);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-            if (visible) {
-                RenderHelper.disableStandardItemLighting();
-                mc.getTextureManager().bindTexture(guiTexture);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-                drawTexturedModalRect(x, y, 44, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
-
-                int colour = 0xE0E0E0;
-                if (!enabled) {
-                    colour = 0xA0A0A0;
-                } else if (hover) {
-                    colour = 0xFFFFA0;
-                }
-
-                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
-                RenderHelper.enableStandardItemLighting();
-            }
-        }
+    @Override
+    public void onChangeSliderValue(GuiSlider slider) {
+        slider.displayString = slider.dispString + " " + TileEntitySoundMuffler.getRange(slider.getValueInt());
+        muffler.setRange(slider.getValueInt());
     }
 
     private final class GuiSoundList extends GuiScrollingList {
@@ -281,94 +234,24 @@ public class GuiSoundMuffler extends GuiContainer {
         }
     }
 
-    private final class GuiSlider extends GuiButton {
+    private final class GuiSliderExt extends GuiSlider {
 
-        private float sliderValue;
-        public boolean dragging;
-        private final float minValue;
-        private final float maxValue;
-
-        public GuiSlider(int buttonId, int x, int y) {
-            this(buttonId, x, y, 0.0F, 1.0F);
-        }
-
-        public GuiSlider(int buttonId, int x, int y, float minValueIn, float maxValueIn) {
-            super(buttonId, x, y, 128, 14, I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange()));
-            minValue = minValueIn;
-            maxValue = maxValueIn;
-            sliderValue = normalizeValue((float)muffler.getRangeIndex());
-        }
-
-        @Override
-        protected int getHoverState(boolean mouseOver) {
-            return 0;
+        GuiSliderExt(int id, int xPos, int yPos, int width, int height, String prefix, String suf, double minVal, double maxVal, double currentVal, boolean showDec, boolean drawStr, @Nullable ISlider par) {
+            super(id, xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, par);
+            displayString = dispString + " " + TileEntitySoundMuffler.getRange(getValueInt());
         }
 
         @Override
         protected void mouseDragged(Minecraft mc, int mouseX, int mouseY) {
-            if (visible) {
-                if (dragging) {
-                    sliderValue = (float)(mouseX - (x + 4)) / (float)(width - 8);
-                    sliderValue = MathHelper.clamp(sliderValue, 0.0F, 1.0F);
-                    float f = denormalizeValue(sliderValue);
-                    muffler.setRange((int) f);
-                    sliderValue = normalizeValue(f);
-                    displayString = I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange());
+            if (this.visible) {
+                if (this.dragging) {
+                    this.sliderValue = (mouseX - (this.x + 4)) / (float)(this.width - 8);
+                    updateSlider();
                 }
 
-                mc.getTextureManager().bindTexture(guiTexture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                drawTexturedModalRect(x + (int)(sliderValue * (float)(width - 8)), y, 128, 212, 8, 14);
+                GuiUtils.drawContinuousTexturedBox(BUTTON_TEXTURES, this.x + (int)(this.sliderValue * (float)(this.width - 8)), this.y, 0, 66, 8, height, 200, 20, 2, 3, 2, 2, zLevel);
             }
-        }
-
-        @Override
-        public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
-            if (super.mousePressed(mc, mouseX, mouseY)) {
-                sliderValue = (float)(mouseX - (x + 4)) / (float)(width - 8);
-                sliderValue = MathHelper.clamp(sliderValue, 0.0F, 1.0F);
-                muffler.setRange((int) denormalizeValue(sliderValue));
-                displayString = I18n.format("tile.sound_muffler.gui.slider.range", muffler.getRange());
-                dragging = true;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public void mouseReleased(int mouseX, int mouseY) {
-            dragging = false;
-        }
-
-        @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-            if (visible) {
-                RenderHelper.disableStandardItemLighting();
-                mc.getTextureManager().bindTexture(guiTexture);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                drawTexturedModalRect(x, y, 0, 212, width, height);
-                mouseDragged(mc, mouseX, mouseY);
-                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, 0xE0E0E0);
-                RenderHelper.enableStandardItemLighting();
-            }
-        }
-
-        private float normalizeValue(float value) {
-            return MathHelper.clamp(snapToStepClamp(value) / maxValue, 0.0F, 1.0F);
-        }
-
-        private float denormalizeValue(float value) {
-            return snapToStepClamp(maxValue * MathHelper.clamp(value, 0.0F, 1.0F));
-        }
-
-        private float snapToStepClamp(float value) {
-            value = snapToStep(value);
-            return MathHelper.clamp(value, minValue, maxValue);
-        }
-
-        private float snapToStep(float value) {
-            return Math.round(value / 1);
         }
     }
 }

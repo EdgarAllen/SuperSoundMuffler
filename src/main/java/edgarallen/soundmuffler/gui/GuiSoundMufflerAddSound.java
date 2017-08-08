@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
@@ -16,12 +15,12 @@ import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.client.GuiScrollingList;
+import net.minecraftforge.fml.client.config.GuiButtonExt;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,10 +37,10 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     private final GuiScreen prevScreen;
     private final IMufflerAccessor muffler;
 
-    private GuiShortButton allSoundsButton;
-    private GuiShortButton recentSoundsButton;
-    private GuiShortButton addSoundButton;
-    private GuiShortButton cancelButton;
+    private GuiButtonExt allSoundsButton;
+    private GuiButtonExt recentSoundsButton;
+    private GuiButtonExt addSoundButton;
+    private GuiButtonExt cancelButton;
     private GuiTextField searchField;
     private GuiSoundList soundList;
 
@@ -77,15 +76,15 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
     public void initGui() {
         super.initGui();
 
-        allSoundsButton = new GuiShortButton(0, guiLeft + 159, guiTop + 5, I18n.format("tile.sound_muffler.add_sound.gui.button.all"));
+        allSoundsButton = new GuiButtonExt(0, guiLeft + 159, guiTop + 5, 44, 14, I18n.format("tile.sound_muffler.add_sound.gui.button.all"));
         buttonList.add(allSoundsButton);
         allSoundsButton.enabled = false;
-        recentSoundsButton = new GuiShortButton(1, guiLeft + 205, guiTop + 5, I18n.format("tile.sound_muffler.add_sound.gui.button.recent"));
+        recentSoundsButton = new GuiButtonExt(1, guiLeft + 205, guiTop + 5, 44, 14, I18n.format("tile.sound_muffler.add_sound.gui.button.recent"));
         buttonList.add(recentSoundsButton);
-        addSoundButton = new GuiShortButton(2, guiLeft + 159, guiTop + 151, I18n.format("tile.sound_muffler.add_sound.gui.button.add"));
+        addSoundButton = new GuiButtonExt(2, guiLeft + 159, guiTop + 151, 44, 14, I18n.format("tile.sound_muffler.add_sound.gui.button.add"));
         buttonList.add(addSoundButton);
         addSoundButton.enabled = false;
-        cancelButton = new GuiShortButton(3, guiLeft + 205, guiTop + 151, I18n.format("tile.sound_muffler.add_sound.gui.button.cancel"));
+        cancelButton = new GuiButtonExt(3, guiLeft + 205, guiTop + 151, 44, 14, I18n.format("tile.sound_muffler.add_sound.gui.button.cancel"));
         buttonList.add(cancelButton);
 
         soundList = new GuiSoundList(240, 112, guiTop + 22, guiTop + 134, guiLeft + 8, 14);
@@ -220,34 +219,6 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
         } else {
             searchField.setTextColor(searchField.isFocused() ? TEXT_COLOR_FOCUSED : TEXT_COLOR_ACTIVE);
             searchField.drawTextBox();
-        }
-    }
-
-    private final class GuiShortButton extends GuiButton {
-        GuiShortButton(int id, int xPos, int yPos, String label) {
-            super(id, xPos, yPos, 44, 14, label);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-            if (visible) {
-                RenderHelper.disableStandardItemLighting();
-                mc.getTextureManager().bindTexture(guiTexture);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                boolean hover = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-                drawTexturedModalRect(x, y, 0, ySize + (enabled ? hover ? 14 : 0 : 28), width, height);
-
-                int colour = 0xE0E0E0;
-                if (!enabled) {
-                    colour = 0xA0A0A0;
-                } else if (hover) {
-                    colour = 0xFFFFA0;
-                }
-                drawCenteredString(fontRenderer, displayString, x + width / 2, y + (height - 8) / 2, colour);
-
-                RenderHelper.enableStandardItemLighting();
-            }
         }
     }
 

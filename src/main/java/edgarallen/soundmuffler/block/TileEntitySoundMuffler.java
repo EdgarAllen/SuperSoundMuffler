@@ -1,5 +1,6 @@
 package edgarallen.soundmuffler.block;
 
+import edgarallen.soundmuffler.SuperSoundMuffler;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,7 +10,6 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -20,8 +20,13 @@ import java.util.List;
 public class TileEntitySoundMuffler extends TileEntity {
     private HashSet<ResourceLocation> muffledSounds = new HashSet<>();
     private boolean whiteListMode = true;
-    private final int[] ranges = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 32, 64, 128, 256 };
+    private static final int[] ranges = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 32, 64, 128, 256 };
     private int rangeIndex = 7;
+
+    @Override
+    public void onLoad() {
+        SuperSoundMuffler.proxy.cacheMuffler(this);
+    }
 
     //region NBT Serialization
     @Override
@@ -134,8 +139,7 @@ public class TileEntitySoundMuffler extends TileEntity {
     }
 
     public boolean shouldMuffleSound(ISound sound) {
-        Vec3d centeredPos = new Vec3d(((float)pos.getX()) + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
-        double dist = centeredPos.squareDistanceTo(sound.getXPosF(), sound.getYPosF(), sound.getZPosF());
+        double dist = getDistanceSq(sound.getXPosF(), sound.getYPosF(), sound.getZPosF());
         int range = getRange();
         return dist <= ((range * range) + 1) && shouldMuffleSound(sound.getSoundLocation());
     }
@@ -149,6 +153,10 @@ public class TileEntitySoundMuffler extends TileEntity {
     }
 
     public int getRange() {
+        return ranges[rangeIndex];
+    }
+
+    public static int getRange(int rangeIndex) {
         return ranges[rangeIndex];
     }
 

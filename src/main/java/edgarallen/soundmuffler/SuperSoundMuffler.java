@@ -19,7 +19,6 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,15 +37,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Mod(modid = SuperSoundMuffler.MOD_ID, name = SuperSoundMuffler.NAME, version = SuperSoundMuffler.VERSION, dependencies = SuperSoundMuffler.DEPENDENCIES)
 public class SuperSoundMuffler {
     public static final String MOD_ID = "supersoundmuffler";
     public static final String NAME = "Super Sound Muffler";
-    public static final String VERSION = "1.0.1.5";
+    public static final String VERSION = "1.0.2.6";
     public static final String DEPENDENCIES = "after:baubles;after:theoneprobe;after:waila";
 
     @Mod.Instance(MOD_ID)
@@ -96,8 +94,12 @@ public class SuperSoundMuffler {
         if(world != null) {
             ISound sound = event.getSound();
 
-            if (tryMuffleBauble(event, sound)) { return; }
-            if (tryMuffleBlock(event, world, sound)) { return; }
+            if (tryMuffleBauble(event, sound)) {
+                return;
+            }
+            if (tryMuffleBlock(event, world, sound)) {
+                return;
+            }
 
             recentSounds.offer(sound.getSoundLocation());
         }
@@ -136,14 +138,13 @@ public class SuperSoundMuffler {
 
     @SideOnly(Side.CLIENT)
     private boolean tryMuffleBlock(PlaySoundEvent event, WorldClient world, ISound sound) {
-        List<TileEntity> mufflers = world.loadedTileEntityList.stream().filter(TileEntitySoundMuffler.class::isInstance).collect(Collectors.toList());
-        for(TileEntity tile : mufflers) {
-            if(((TileEntitySoundMuffler)tile).shouldMuffleSound(sound)) {
-                event.setResultSound(null);
-                return true;
+        Set<TileEntitySoundMuffler> mufflers = SuperSoundMuffler.proxy.getTileEntities();
+        for(TileEntitySoundMuffler tile : mufflers) {
+            if(!tile.isInvalid() && tile.shouldMuffleSound(sound)) {
+                 event.setResultSound(null);
+                 return true;
             }
         }
-
         return false;
     }
 

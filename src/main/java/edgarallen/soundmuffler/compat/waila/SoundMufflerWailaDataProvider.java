@@ -35,6 +35,7 @@ public class SoundMufflerWailaDataProvider implements IWailaDataProvider {
         TileEntitySoundMuffler tileEntity = (TileEntitySoundMuffler) accessor.getTileEntity();
         String key = tileEntity.isWhiteList() ? "item.sound_muffler.tooltip.mode.white_list" : "item.sound_muffler.tooltip.mode.black_list";
         currenttip.add(I18n.format(key));
+        currenttip.add(I18n.format("item.sound_muffler.tooltip.range", tileEntity.getRange()));
         List<ResourceLocation> sounds = tileEntity.getMuffledSounds();
         if(sounds.isEmpty()) {
             currenttip.add(I18n.format("item.sound_muffler.tooltip.sounds.count", 0));
