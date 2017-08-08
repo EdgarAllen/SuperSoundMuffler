@@ -153,7 +153,7 @@ public class BlockSoundMuffler extends BlockContainer {
             String key = showWhiteListTooltip ? "item.sound_muffler.tooltip.mode.white_list" : "item.sound_muffler.tooltip.mode.black_list";
             tooltip.add(I18n.format(key));
 
-            int rangeIndex = compound.hasKey("rangeIndex") ? compound.getInteger("rangeIndex") : 7;
+            int rangeIndex = compound.hasKey("rangeIndex") ? compound.getInteger("rangeIndex") : TileEntitySoundMuffler.getDefaultRangeIndex();
             tooltip.add(I18n.format("item.sound_muffler.tooltip.range", TileEntitySoundMuffler.getRange(rangeIndex)));
 
             if(compound.hasKey("sounds")) {
@@ -171,7 +171,7 @@ public class BlockSoundMuffler extends BlockContainer {
             }
         } else {
             tooltip.add(I18n.format("item.sound_muffler.tooltip.mode.white_list"));
-            tooltip.add(I18n.format("item.sound_muffler.tooltip.range", TileEntitySoundMuffler.getRange(7)));
+            tooltip.add(I18n.format("item.sound_muffler.tooltip.range", TileEntitySoundMuffler.getDefaultRange()));
             tooltip.add(I18n.format("item.sound_muffler.tooltip.sounds.count", 0));
         }
     }

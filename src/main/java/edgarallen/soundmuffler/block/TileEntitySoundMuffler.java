@@ -21,7 +21,8 @@ public class TileEntitySoundMuffler extends TileEntity {
     private HashSet<ResourceLocation> muffledSounds = new HashSet<>();
     private boolean whiteListMode = true;
     private static final int[] ranges = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 32, 64, 128, 256 };
-    private int rangeIndex = 7;
+    private static final int defaultRangeIndex = 7;
+    private int rangeIndex = defaultRangeIndex;
 
     @Override
     public void onLoad() {
@@ -163,4 +164,8 @@ public class TileEntitySoundMuffler extends TileEntity {
     public int getRangeIndex() {
         return rangeIndex;
     }
+
+    public static int getDefaultRange() { return ranges[defaultRangeIndex]; }
+
+    public static int getDefaultRangeIndex() { return defaultRangeIndex; }
 }
