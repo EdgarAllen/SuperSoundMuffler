@@ -117,6 +117,7 @@ public class GuiSoundMuffler extends GuiContainer implements GuiSlider.ISlider {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        drawDefaultBackground();
         RenderHelper.disableStandardItemLighting();
         int xPos = (width - xSize) / 2;
         int yPos = (height - ySize) / 2;
