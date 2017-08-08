@@ -20,5 +20,5 @@ item.sound_muffler.tooltip.range=Range: §8%d
 item.sound_muffler_bauble.name=Super Sound Muffler
 item.sound_muffler_bauble.tooltip.header=§8§oBauble Edition
 
-jei.tile.sound_muffler=Muffles nearby sounds within an 8 block radius. Can be configured to muffle specific sounds.
+jei.tile.sound_muffler=Muffles nearby sounds. Can be configured to muffle specific sounds.
 jei.item.sound_muffler_bauble=A bauble version of the SoundMuffler. Right clicking opens the configuration GUI. Sneak right clicking enables/disables its effect.
