@@ -11,9 +11,9 @@ buildscript {
 apply plugin: 'maven'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.2.8"
+version = "1.0.2.9"
 group= "edgarallen.soundmuffler" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "supersoundmuffler-1.12"
+archivesBaseName = "supersoundmuffler-1.12.1"
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8 // Need this here so eclipse task generates correctly.
 compileJava {
@@ -21,7 +21,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12-14.21.1.2443"
+    version = "1.12.1-14.22.0.2474"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -59,11 +59,11 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12:4.7.4.80"
+    deobfCompile "mezz.jei:jei_1.12.1:4.7.8.93"
 //    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.19-B33_1.12"
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
 //    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.14-7"
-    deobfCompile 'com.github.Azanor:Baubles:7a677f9'
+    deobfCompile 'com.github.Azanor:Baubles:b6be83e'
 }
 
 processResources
