@@ -3,6 +3,8 @@ package edgarallen.soundmuffler.gui;
 import edgarallen.soundmuffler.SuperSoundMuffler;
 import edgarallen.soundmuffler.gui.data.IMufflerAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.SoundRegistry;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -16,13 +18,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.client.GuiScrollingList;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
+import net.minecraftforge.fml.relauncher.CoreModManager;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GuiSoundMufflerAddSound extends GuiContainer {
@@ -68,8 +71,33 @@ public class GuiSoundMufflerAddSound extends GuiContainer {
 
     private void lazyLoadAllSoundsList() {
         allSounds = new ArrayList<>();
-        allSounds.addAll(SoundEvent.REGISTRY.getKeys());
+        allSounds.addAll(getSoundList());
         allSounds.sort(Comparator.comparing(ResourceLocation::toString));
+    }
+
+    private Set<ResourceLocation> getSoundList() {
+        boolean isDeobf = false;
+        try {
+            final Field f = CoreModManager.class.getDeclaredField("deobfuscatedEnvironment");
+            f.setAccessible(true);
+            isDeobf = f.getBoolean(null);
+        } catch (@Nonnull final Throwable t) {
+            SuperSoundMuffler.log.error("Are we in a dev environment? No clue... Error'd before I could find out. RIP", t);
+        }
+        Set<ResourceLocation> sounds = Collections.EMPTY_SET;
+        try {
+            final Field f = SoundHandler.class.getDeclaredField(isDeobf ? "soundRegistry": "field_147697_e");
+            f.setAccessible(true);
+            SoundRegistry registry = (SoundRegistry) f.get(Minecraft.getMinecraft().getSoundHandler());
+
+            if(registry != null) {
+                sounds = registry.getKeys();
+            }
+        } catch (@Nonnull final Throwable t) {
+            SuperSoundMuffler.log.error("Couldn't access sound registry for sounds list", t);
+        }
+
+        return sounds;
     }
 
     @Override
