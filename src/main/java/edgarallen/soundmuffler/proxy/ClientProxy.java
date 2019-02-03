@@ -7,13 +7,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy extends CommonProxy {
-    private WeakHashMap<TileEntitySoundMuffler, WeakReference<TileEntitySoundMuffler>> soundMufflers = new WeakHashMap<>();
+    private Set<TileEntitySoundMuffler> soundMufflers = Collections.newSetFromMap(new WeakHashMap<>());
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
@@ -23,7 +23,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void cacheMuffler(TileEntitySoundMuffler tileEntity) {
-        soundMufflers.put(tileEntity, new WeakReference<>(tileEntity));
+        soundMufflers.add(tileEntity);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public Set<TileEntitySoundMuffler> getTileEntities() {
-        return soundMufflers.keySet();
+        return soundMufflers;
     }
 }
