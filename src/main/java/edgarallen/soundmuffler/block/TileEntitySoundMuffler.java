@@ -25,7 +25,14 @@ public class TileEntitySoundMuffler extends TileEntity {
     private int rangeIndex = defaultRangeIndex;
 
     @Override
-    public void onLoad() {
+    public void invalidate() {
+        super.invalidate();
+        SuperSoundMuffler.proxy.uncacheMuffler(this);
+    }
+
+    @Override
+    public void validate() {
+        super.validate();
         SuperSoundMuffler.proxy.cacheMuffler(this);
     }
 

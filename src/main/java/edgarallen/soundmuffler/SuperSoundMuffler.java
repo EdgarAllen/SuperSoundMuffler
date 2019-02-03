@@ -7,6 +7,7 @@ import com.google.common.collect.EvictingQueue;
 import edgarallen.soundmuffler.bauble.ItemSoundMufflerBauble;
 import edgarallen.soundmuffler.block.BlockSoundMuffler;
 import edgarallen.soundmuffler.block.TileEntitySoundMuffler;
+import edgarallen.soundmuffler.compat.top.TOPCompatibility;
 import edgarallen.soundmuffler.compat.waila.SoundMufflerWailaDataProvider;
 import edgarallen.soundmuffler.config.Config;
 import edgarallen.soundmuffler.gui.GuiHandler;
@@ -29,6 +30,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -44,7 +46,7 @@ import java.util.Set;
 public class SuperSoundMuffler {
     public static final String MOD_ID = "supersoundmuffler";
     public static final String NAME = "Super Sound Muffler";
-    public static final String VERSION = "1.0.2.9";
+    public static final String VERSION = "1.0.2.10-RC1";
     public static final String DEPENDENCIES = "after:baubles;after:theoneprobe;after:waila";
 
     @Mod.Instance(MOD_ID)
@@ -69,7 +71,7 @@ public class SuperSoundMuffler {
         Config.readConfig(event.getSuggestedConfigurationFile());
         ThePacketeer.init();
 
-        if(event.getSide() == Side.CLIENT) {
+        if (event.getSide() == Side.CLIENT) {
             MinecraftForge.EVENT_BUS.register(this);
         }
     }
@@ -77,8 +79,12 @@ public class SuperSoundMuffler {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
-        if(Loader.isModLoaded("waila")) {
+        if (Loader.isModLoaded("waila")) {
             SoundMufflerWailaDataProvider.register();
+        }
+
+        if (Loader.isModLoaded("theoneprobe")) {
+            TOPCompatibility.register();
         }
     }
 
@@ -91,7 +97,7 @@ public class SuperSoundMuffler {
     @SideOnly(Side.CLIENT)
     public void onPlaySound(PlaySoundEvent event) {
         WorldClient world = Minecraft.getMinecraft().world;
-        if(world != null) {
+        if (world != null) {
             ISound sound = event.getSound();
 
             if (tryMuffleBauble(event, sound)) {
@@ -108,24 +114,24 @@ public class SuperSoundMuffler {
     @SideOnly(Side.CLIENT)
     private boolean tryMuffleBauble(PlaySoundEvent event, ISound sound) {
         EntityPlayer player = Minecraft.getMinecraft().player;
-        if(player != null) {
+        if (player != null) {
             InventoryPlayer inventory = player.inventory;
             for (int slot = 0; slot < inventory.getSizeInventory(); ++slot) {
                 ItemStack stack = inventory.getStackInSlot(slot);
-                if(!stack.isEmpty() && stack.getItem() == itemSoundMufflerBauble) {
-                    if(itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
+                if (!stack.isEmpty() && stack.getItem() == itemSoundMufflerBauble) {
+                    if (itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
                         event.setResultSound(null);
                         return true;
                     }
                 }
             }
 
-            if(checkBaubleSlots) {
+            if (checkBaubleSlots) {
                 IBaublesItemHandler baubles = player.getCapability(BaublesCapabilities.CAPABILITY_BAUBLES, player.getHorizontalFacing());
-                for(int slot = 0; slot < baubles.getSlots(); ++slot) {
+                for (int slot = 0; slot < baubles.getSlots(); ++slot) {
                     ItemStack stack = baubles.getStackInSlot(slot);
                     if (!stack.isEmpty() && stack.getItem() == itemSoundMufflerBauble) {
-                        if(itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
+                        if (itemSoundMufflerBauble.shouldMuffleSound(stack, sound.getSoundLocation())) {
                             event.setResultSound(null);
                             return true;
                         }
@@ -139,10 +145,10 @@ public class SuperSoundMuffler {
     @SideOnly(Side.CLIENT)
     private boolean tryMuffleBlock(PlaySoundEvent event, WorldClient world, ISound sound) {
         Set<TileEntitySoundMuffler> mufflers = SuperSoundMuffler.proxy.getTileEntities();
-        for(TileEntitySoundMuffler tile : mufflers) {
-            if(!tile.isInvalid() && tile.shouldMuffleSound(sound)) {
-                 event.setResultSound(null);
-                 return true;
+        for (TileEntitySoundMuffler tile : mufflers) {
+            if (!tile.isInvalid() && world == tile.getWorld() && tile.shouldMuffleSound(sound)) {
+                event.setResultSound(null);
+                return true;
             }
         }
         return false;
@@ -152,11 +158,16 @@ public class SuperSoundMuffler {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        if(event.phase == TickEvent.Phase.END) {
+        if (event.phase == TickEvent.Phase.END) {
             GuiScreen gui = Minecraft.getMinecraft().currentScreen;
-            if(gui == null || !gui.doesGuiPauseGame()) {
+            if (gui == null || !gui.doesGuiPauseGame()) {
                 ticksInGame++;
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) {
+         proxy.clearCache();
     }
 }

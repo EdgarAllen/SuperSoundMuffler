@@ -11,9 +11,9 @@ buildscript {
 apply plugin: 'maven'
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.2.9"
+version = "1.0.2.10-RC1"
 group= "edgarallen.soundmuffler" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "supersoundmuffler-1.12.1"
+archivesBaseName = "supersoundmuffler-1.12.2"
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8 // Need this here so eclipse task generates correctly.
 compileJava {
@@ -21,7 +21,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.1-14.22.0.2474"
+    version = "1.12.2-14.23.5.2808"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -29,7 +29,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20170624"
+    mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
@@ -38,10 +38,7 @@ repositories {
         name "JEI"
         url "http://dvs1.progwml6.com/files/maven"
     }
-    maven {
-        name "WAILA"
-        url "http://mobiusstrip.eu/maven"
-    }
+    
     maven {
         name "TheOneProbe"
         url "http://maven.tterrag.com/"
@@ -59,11 +56,10 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12.1:4.7.8.93"
-//    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.20-B35_1.12"
-//    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.14-7"
-    deobfCompile 'com.github.Azanor:Baubles:b6be83e'
+    deobfCompile "mezz.jei:jei_1.12.2:4.14.4.264"
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.26-B41_1.12.2"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.28-17"
+    deobfCompile 'com.github.Azanor:Baubles:5df3d46'
 }
 
 processResources

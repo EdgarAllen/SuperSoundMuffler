@@ -27,6 +27,16 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void uncacheMuffler(TileEntitySoundMuffler tileEntity) {
+        soundMufflers.remove(tileEntity);
+    }
+
+    @Override
+    public void clearCache() {
+        soundMufflers.clear();
+    }
+
+    @Override
     public Set<TileEntitySoundMuffler> getTileEntities() {
         return soundMufflers.keySet();
     }

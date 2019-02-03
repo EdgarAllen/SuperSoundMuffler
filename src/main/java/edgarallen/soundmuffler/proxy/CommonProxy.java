@@ -30,5 +30,7 @@ public class CommonProxy {
     }
 
     public void cacheMuffler(TileEntitySoundMuffler tileEntity) { }
+    public void uncacheMuffler(TileEntitySoundMuffler tileEntity) { }
+    public void clearCache() { }
     public Set<TileEntitySoundMuffler> getTileEntities() { return Collections.EMPTY_SET; }
 }
